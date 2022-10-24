@@ -1,13 +1,15 @@
 pub mod settings;
+pub mod conversion;
 
-pub fn run(config: &settings::config::Config) -> Result<(), Box<dyn std::error::Error>> {
+pub fn run(input: &String, config: &settings::config::Config) -> Result<(), Box<dyn std::error::Error>> {
     if config.help() {
         println!("{}", help_text());
         return Ok(());
     }
 
+    let result = conversion::xml_conversion::convert(&input);
+    print!("Result:\n{result}");
 
-    std::fs::read_to_string("invalid")?;
     Ok(())
 }
 
