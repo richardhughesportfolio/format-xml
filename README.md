@@ -29,3 +29,9 @@ To fail on an error. Note that `formatted.xml` will contain the contents of `inv
 ```bash
 cat invalid.xml | fxml --strict > formatted.xml
 ```
+
+To see the help text:
+
+```bash
+fxml --help
+```
