@@ -30,17 +30,20 @@ pub fn convert(input: &str) -> String {
                         xmlparser::ElementEnd::Close(_, _) => {
                             indent -= 1;
                             insert_indented_text(indent, &span, &mut output);
+                            output.push('\n');
                         },
                         xmlparser::ElementEnd::Empty => {
                             insert_indented_text(indent, &span, &mut output);
+                            output.push('\n');
                         }
                     }
                 },
                 xmlparser::Token::Text { text } => {
                     if !text.is_empty() {
                         insert_indented_text(indent, &text, &mut output);
-                        output.push('\n');
                     }
+
+                    output.push('\n');
                 },
                 // xmlparser::Token::Cdata { text, span } => todo!(),
                 _ => continue,
@@ -86,13 +89,26 @@ mod tests {
     }
 
     fn valid_convert_test_cases() -> Vec<(&'static str, &'static str)> {
-        vec![("<tag/>", "<tag/>"),
-            ("<tag />", "<tag/>"),
-            ("<tag></tag>", r#"<tag>
-</tag>"#),
-            ("<tag>text</tag>", r#"<tag>
+        vec![
+            ("<tag/>", "<tag/>\n"),
+            ("<tag />", "<tag/>\n"),
+            ("<tag></tag>",
+r#"<tag>
+</tag>
+"#),
+            ("<tag>text</tag>",
+r#"<tag>
     text
-</tag>"#)]
+</tag>
+"#),
+            ("<tag><tag></tag><tag></tag></tag>",
+r#"<tag>
+    <tag>
+    </tag>
+    <tag>
+    </tag>
+</tag>
+"#)]
     }
 
     #[test]
