@@ -18,14 +18,15 @@ pub fn convert(input: &str) -> String {
                 // xmlparser::Token::EntityDeclaration { name, definition, span } => todo!(),
                 // xmlparser::Token::DtdEnd { span } => todo!(),
                 xmlparser::Token::ElementStart { prefix, local, span } => {
-                    output.push('<');
-                    output.push_str(&local)
+                    output.push_str(&span)
                 },
                 // xmlparser::Token::Attribute { prefix, local, value, span } => todo!(),
                 xmlparser::Token::ElementEnd { end, span } => {
-                    output.push_str("</");
-                    output.push_str(&span);
-                    output.push('>');
+                    match end {
+                        xmlparser::ElementEnd::Open => output.push_str(">\n"),
+                        xmlparser::ElementEnd::Close(_, _) => output.push_str(&span),
+                        xmlparser::ElementEnd::Empty => output.push_str(&span),
+                    }
                 },
                 // xmlparser::Token::Text { text } => todo!(),
                 // xmlparser::Token::Cdata { text, span } => todo!(),
@@ -61,7 +62,8 @@ mod tests {
 
     #[test]
     fn convert_valid_input_returns_formatted_input() {
-        let input = "<tag></tag>";
+        let input = r#"<tag>
+</tag>"#;
 
         let result = convert(input);
         println!("{result}");
