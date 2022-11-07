@@ -15,11 +15,14 @@ fn main() {
         }
     }
 
-    if let Err(e) = fxml::run(&input, &config) {
-        eprintln!("An error occurred when running fxml: {e}");
-
-        if config.strict() {
-            std::process::exit(1);
-        }
+    match fxml::run(&input, &config) {
+        Ok(output) => print!("{output}"),
+        Err(e) => {
+            eprintln!("An error occurred when running fxml: {e}");
+    
+            if config.strict() {
+                std::process::exit(1);
+            }
+        },
     }
 }
