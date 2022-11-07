@@ -17,7 +17,7 @@ pub fn convert(input: &str) -> String {
                 // xmlparser::Token::EmptyDtd { name, external_id, span } => todo!(),
                 // xmlparser::Token::EntityDeclaration { name, definition, span } => todo!(),
                 // xmlparser::Token::DtdEnd { span } => todo!(),
-                xmlparser::Token::ElementStart { prefix, local, span } => {
+                xmlparser::Token::ElementStart { prefix: _, local: _, span } => {
                     insert_indented_text(indent, &span, &mut output);
                 },
                 // xmlparser::Token::Attribute { prefix, local, value, span } => todo!(),
@@ -54,8 +54,10 @@ pub fn convert(input: &str) -> String {
 fn insert_indented_text(indent: i32, text: &str, output: &mut String) {
     let indent_size = 4;
 
-    for i in (0..indent * indent_size) {
+    let mut i = 0;
+    while i < indent * indent_size {
         output.push(' ');
+        i += 1;
     }
 
     output.push_str(text);
