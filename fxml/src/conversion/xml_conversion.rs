@@ -18,17 +18,30 @@ pub fn convert(input: &str) -> String {
                 // xmlparser::Token::EntityDeclaration { name, definition, span } => todo!(),
                 // xmlparser::Token::DtdEnd { span } => todo!(),
                 xmlparser::Token::ElementStart { prefix, local, span } => {
-                    output.push_str(&span)
+                    insert_indented_text(indent, &span, &mut output);
                 },
                 // xmlparser::Token::Attribute { prefix, local, value, span } => todo!(),
                 xmlparser::Token::ElementEnd { end, span } => {
                     match end {
-                        xmlparser::ElementEnd::Open => output.push_str(">\n"),
-                        xmlparser::ElementEnd::Close(_, _) => output.push_str(&span),
-                        xmlparser::ElementEnd::Empty => output.push_str(&span),
+                        xmlparser::ElementEnd::Open => {
+                            output.push_str(">\n");
+                            indent += 1;
+                        },
+                        xmlparser::ElementEnd::Close(_, _) => {
+                            indent -= 1;
+                            insert_indented_text(indent, &span, &mut output);
+                        },
+                        xmlparser::ElementEnd::Empty => {
+                            insert_indented_text(indent, &span, &mut output);
+                        }
                     }
                 },
-                // xmlparser::Token::Text { text } => todo!(),
+                xmlparser::Token::Text { text } => {
+                    if !text.is_empty() {
+                        insert_indented_text(indent, &text, &mut output);
+                        output.push('\n');
+                    }
+                },
                 // xmlparser::Token::Cdata { text, span } => todo!(),
                 _ => continue,
             },
@@ -36,6 +49,16 @@ pub fn convert(input: &str) -> String {
     }
 
     output
+}
+
+fn insert_indented_text(indent: i32, text: &str, output: &mut String) {
+    let indent_size = 4;
+
+    for i in (0..indent * indent_size) {
+        output.push(' ');
+    }
+
+    output.push_str(text);
 }
 
 #[cfg(test)]
@@ -60,14 +83,21 @@ mod tests {
         assert_eq!(input, result);
     }
 
+    fn valid_convert_test_cases() -> Vec<(&'static str, &'static str)> {
+        vec![("<tag/>", "<tag/>"),
+            ("<tag />", "<tag/>"),
+            ("<tag></tag>", r#"<tag>
+</tag>"#),
+            ("<tag>text</tag>", r#"<tag>
+    text
+</tag>"#)]
+    }
+
     #[test]
     fn convert_valid_input_returns_formatted_input() {
-        let input = r#"<tag>
-</tag>"#;
-
-        let result = convert(input);
-        println!("{result}");
-
-        assert_eq!(input, result);
+        for (input, expected) in valid_convert_test_cases() {
+            let result = convert(input);
+            assert_eq!(expected, result);
+        }
     }
 }
