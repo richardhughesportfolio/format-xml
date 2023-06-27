@@ -37,6 +37,7 @@ public static class Formatter
 
         using MemoryStream outputStream = new();
         doc.Save(outputStream);
+        outputStream.Seek(0, SeekOrigin.Begin);
 
         using StreamReader reader = new(outputStream);
         var formattedXml = await reader.ReadToEndAsync();
