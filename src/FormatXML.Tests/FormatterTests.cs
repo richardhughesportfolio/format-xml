@@ -81,6 +81,17 @@ public class FormatterTests
         }
     }
 
+    [Fact]
+    public async Task GivenInvalidXmlThatSameXmlIsReturned()
+    {
+        var invalidXml = "<invalid xml...";
+
+        var result = await Formatter.Format(invalidXml);
+
+        var expected = invalidXml;
+        Assert.Equal(expected, result);
+    }
+
     #endregion
 
     #endregion

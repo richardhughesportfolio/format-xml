@@ -1,7 +1,4 @@
-using System.Text;
-using System.Text.Unicode;
 using System.Xml;
-using System.Xml.Serialization;
 
 namespace FormatXML;
 
@@ -32,17 +29,25 @@ public static class Formatter
             return String.Empty;
         }
 
-        XmlDocument doc = new();
-        doc.LoadXml(xmlToFormat);
+        try
+        {
+            XmlDocument doc = new();
+            doc.LoadXml(xmlToFormat);
 
-        using MemoryStream outputStream = new();
-        doc.Save(outputStream);
-        outputStream.Seek(0, SeekOrigin.Begin);
+            using MemoryStream outputStream = new();
+            doc.Save(outputStream);
+            outputStream.Seek(0, SeekOrigin.Begin);
 
-        using StreamReader reader = new(outputStream);
-        var formattedXml = await reader.ReadToEndAsync();
+            using StreamReader reader = new(outputStream);
+            var formattedXml = await reader.ReadToEndAsync();
 
-        return formattedXml;
+            return formattedXml;
+        }
+        catch (XmlException)
+        {
+            await Console.Error.WriteLineAsync($"Failed to format xml:\n{xmlToFormat}");
+            return xmlToFormat;
+        }
     }
     
     #endregion

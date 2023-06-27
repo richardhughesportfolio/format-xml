@@ -11,3 +11,5 @@ Unformatted XML:
 Formatted XML:
 
 > SampleName_Formatted.xml
+
+The data are too big to store in the code directly. 
