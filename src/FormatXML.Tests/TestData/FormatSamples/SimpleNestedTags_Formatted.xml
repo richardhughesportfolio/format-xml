@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<parent>
+  <child>
+    <tag1>value1</tag1>
+  </child>
+  <child>
+    <tag1>value2</tag1>
+  </child>
+  <child>
+    <tag1>value3</tag1>
+  </child>
+</parent>
