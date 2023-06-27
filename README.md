@@ -1,6 +1,6 @@
 # format-xml
 
-A command line utility to help format XML that is written in Rust.
+A command line utility to help format XML from `stdin` to `stdout`.
 
 - [format-xml](#format-xml)
   - [Usage](#usage)
@@ -24,11 +24,13 @@ Basic usage:
 cat file.xml | fxml > formatted.xml
 ```
 
-To fail on an error. Note that `formatted.xml` will contain the contents of `invalid.xml`.
+To fail on an error:
 
 ```bash
 cat invalid.xml | fxml --strict > formatted.xml
 ```
+
+Note that `formatted.xml` will contain the contents of `invalid.xml`, because on error, the contents of `stdin` are outputted to `stdout`.
 
 To see the help text:
 
