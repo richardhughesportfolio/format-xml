@@ -39,11 +39,11 @@ public class FormatterTests
     #region Format
 
     [Fact]
-    public void Format_NullXmlToFormat_ThrowsArgumentNullException()
+    public async Task Format_NullXmlToFormat_ThrowsArgumentNullException()
     {
         string? input = null;
 
-        Assert.Throws<ArgumentNullException>(() => Formatter.Format(input));
+        await Assert.ThrowsAsync<ArgumentNullException>(() => Formatter.Format(input));
     }
 
     #endregion
@@ -51,11 +51,11 @@ public class FormatterTests
     #region Behavior Tests
 
     [Fact]
-    public void GivenEmptyXmlEmptyOutputIsReturned()
+    public async Task GivenEmptyXmlEmptyOutputIsReturned()
     {
         var input = String.Empty;
 
-        var result = Formatter.Format(input);
+        var result = await Formatter.Format(input);
         
         var expected = String.Empty;
 
@@ -63,7 +63,7 @@ public class FormatterTests
     }
 
     [Fact]
-    public void FormatsXmlCorrectly()
+    public async Task FormatsXmlCorrectly()
     {
         var paths = this.GetFormatSamplePaths();
         Assert.NotEmpty(paths);
@@ -71,11 +71,11 @@ public class FormatterTests
         foreach (var path in paths)
         {
             this.OutputHelper.WriteLine($"Testing `{path.unformattedPath}` against `{path.formattedPath}`.");
-            
-            var unformattedXml = File.ReadAllText(path.unformattedPath);
-            var formattedXml = File.ReadAllText(path.formattedPath);
 
-            var result = Formatter.Format(unformattedXml);
+            var unformattedXml = await File.ReadAllTextAsync(path.unformattedPath);
+            var formattedXml = await File.ReadAllTextAsync(path.formattedPath);
+
+            var result = await Formatter.Format(unformattedXml);
 
             Assert.Equal(formattedXml, result);
         }

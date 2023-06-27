@@ -1,3 +1,8 @@
+using System.Text;
+using System.Text.Unicode;
+using System.Xml;
+using System.Xml.Serialization;
+
 namespace FormatXML;
 
 /// <summary>
@@ -15,19 +20,28 @@ public static class Formatter
     /// </summary>
     /// <param name="xmlToFormat"></param>
     /// <returns></returns>
-    public static string Format(string xmlToFormat)
+    public static async Task<string> Format(string xmlToFormat)
     {
         if (xmlToFormat is null)
         {
             throw new ArgumentNullException(nameof(xmlToFormat));
         }
 
-        if (xmlToFormat.Length <= 0)
+        if (String.IsNullOrWhiteSpace(xmlToFormat))
         {
             return String.Empty;
         }
 
-        return String.Empty;
+        XmlDocument doc = new();
+        doc.LoadXml(xmlToFormat);
+
+        using MemoryStream outputStream = new();
+        doc.Save(outputStream);
+
+        using StreamReader reader = new(outputStream);
+        var formattedXml = await reader.ReadToEndAsync();
+
+        return formattedXml;
     }
     
     #endregion
