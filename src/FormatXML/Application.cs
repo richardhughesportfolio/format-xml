@@ -55,9 +55,13 @@ public class Application
     /// <summary>
     /// Runs this application based on the command line arguments passed into the constructor.
     /// </summary>
-    public void Run()
+    public async Task Run()
     {
-        
+        var inputXml = await this.Stdin.ReadToEndAsync();
+        var result = await Formatter.Format(inputXml);
+
+        await this.Stdout.WriteAsync(result);
+        await this.Stdout.FlushAsync();
     }
     
     #endregion
