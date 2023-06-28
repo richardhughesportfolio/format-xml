@@ -1,2 +1,8 @@
-﻿// See https://aka.ms/new-console-template for more information
-Console.WriteLine("Hello, World!");
+﻿using FormatXML;
+
+Application application = new(
+    Environment.CommandLine,
+    Console.In,
+    Console.Out,
+    Console.Error);
+await application.Run();

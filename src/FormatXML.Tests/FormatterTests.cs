@@ -41,9 +41,9 @@ public class FormatterTests
     [Fact]
     public async Task Format_NullXmlToFormat_ThrowsArgumentNullException()
     {
-        string? input = null;
+        string? xmlToFormat = null;
 
-        await Assert.ThrowsAsync<ArgumentNullException>(() => Formatter.Format(input));
+        await Assert.ThrowsAsync<ArgumentNullException>(() => Formatter.Format(xmlToFormat));
     }
 
     #endregion
@@ -82,14 +82,13 @@ public class FormatterTests
     }
 
     [Fact]
-    public async Task GivenInvalidXmlThatSameXmlIsReturned()
+    public async Task GivenInvalidXmlNullIsReturned()
     {
         var invalidXml = "<invalid xml...";
 
         var result = await Formatter.Format(invalidXml);
 
-        var expected = invalidXml;
-        Assert.Equal(expected, result);
+        Assert.Null(result);
     }
 
     #endregion
