@@ -41,9 +41,9 @@ public class FormatterTests
     [Fact]
     public async Task Format_NullXmlToFormat_ThrowsArgumentNullException()
     {
-        string? input = null;
+        string? xmlToFormat = null;
 
-        await Assert.ThrowsAsync<ArgumentNullException>(() => Formatter.Format(input));
+        await Assert.ThrowsAsync<ArgumentNullException>(() => Formatter.Format(xmlToFormat));
     }
 
     #endregion
