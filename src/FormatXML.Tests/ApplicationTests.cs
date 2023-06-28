@@ -54,7 +54,7 @@ public class ApplicationTests
     #region Behavior Tests
 
     [Fact]
-    public void GivenEmptyStdinNothingIsWrittenToStdout()
+    public async Task GivenEmptyStdinNothingIsWrittenToStdout()
     {
         var commandLineArguments = String.Empty;
 
@@ -65,7 +65,7 @@ public class ApplicationTests
         using StreamWriter stdout = new(stdinStream);
 
         Application application = new(commandLineArguments, stdin, stdout);
-        application.Run();
+        await application.Run();
 
         var expected = 0;
         Assert.Equal(expected, stdout.BaseStream.Length);
@@ -91,6 +91,30 @@ public class ApplicationTests
 
         var formattedXml = "<tag />";
         var expected = formattedXml;
+
+        var result = await this.ReadStringFromStream(stdoutStream);
+        Assert.Equal(expected, result);
+    }
+
+    [Fact]
+    public async Task GivenInvalidXmlInStdinThatSameXmlIsWrittenToStdout()
+    {
+        var commandLineArguments = String.Empty;
+
+        using MemoryStream stdinStream = new();
+        using StreamReader stdin = new(stdinStream);
+
+        var unformattedXml = "<Invalid xml...";
+        await this.WriteStringToStream(unformattedXml, stdinStream);
+        stdinStream.Seek(0, SeekOrigin.Begin);
+
+        using MemoryStream stdoutStream = new();
+        await using StreamWriter stdout = new(stdoutStream);
+
+        Application application = new(commandLineArguments, stdin, stdout);
+        await application.Run();
+
+        var expected = unformattedXml;
 
         var result = await this.ReadStringFromStream(stdoutStream);
         Assert.Equal(expected, result);
