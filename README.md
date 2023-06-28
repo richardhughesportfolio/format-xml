@@ -22,6 +22,7 @@ Basic usage:
 
 ```bash
 cat file.xml | fxml > formatted.xml
+echo "<tag/>" | fxml
 ```
 
 To fail on an error:
