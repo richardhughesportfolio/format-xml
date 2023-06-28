@@ -15,9 +15,9 @@ public static class Formatter
     ///
     /// If empty XML is passed, an empty output is returned.
     /// </summary>
-    /// <param name="xmlToFormat"></param>
-    /// <returns></returns>
-    public static async Task<string> Format(string xmlToFormat)
+    /// <param name="xmlToFormat">The XML to format</param>
+    /// <returns>The formatted XML, or null if the xml was invalid</returns>
+    public static async Task<string?> Format(string xmlToFormat)
     {
         if (xmlToFormat is null)
         {
@@ -45,8 +45,7 @@ public static class Formatter
         }
         catch (XmlException)
         {
-            await Console.Error.WriteLineAsync($"Failed to format xml:\n{xmlToFormat}");
-            return xmlToFormat;
+            return null;
         }
     }
     

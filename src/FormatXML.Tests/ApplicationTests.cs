@@ -26,7 +26,7 @@ public class ApplicationTests
         var stdin = Console.In;
         var stdout = Console.Out;
 
-        Assert.Throws<ArgumentNullException>(() => new Application(commandLineArguments, stdin, stdout));
+        Assert.Throws<ArgumentNullException>(() => new Application(commandLineArguments, stdin, stdout, stdout));
     }
 
     [Fact]
@@ -35,8 +35,9 @@ public class ApplicationTests
         var commandLineArguments = String.Empty;
         TextReader stdin = null;
         var stdout = Console.Out;
+        var stderr = Console.Error;
 
-        Assert.Throws<ArgumentNullException>(() => new Application(commandLineArguments, stdin, stdout));
+        Assert.Throws<ArgumentNullException>(() => new Application(commandLineArguments, stdin, stdout, stdout));
     }
 
     [Fact]
@@ -45,8 +46,20 @@ public class ApplicationTests
         var commandLineArguments = String.Empty;
         var stdin = Console.In;
         TextWriter stdout = null;
+        var stderr = Console.Error;
 
-        Assert.Throws<ArgumentNullException>(() => new Application(commandLineArguments, stdin, stdout));
+        Assert.Throws<ArgumentNullException>(() => new Application(commandLineArguments, stdin, stdout, stdout));
+    }
+
+    [Fact]
+    public void Constructor_NullStderr_ThrowsArgumentNullException()
+    {
+        var commandLineArguments = String.Empty;
+        var stdin = Console.In;
+        var stdout = Console.Out;
+        TextWriter stderr = null;
+
+        Assert.Throws<ArgumentNullException>(() => new Application(commandLineArguments, stdin, stdout, stderr));
     }
 
     #endregion
@@ -64,7 +77,10 @@ public class ApplicationTests
         using MemoryStream stdoutStream = new();
         using StreamWriter stdout = new(stdinStream);
 
-        Application application = new(commandLineArguments, stdin, stdout);
+        using MemoryStream stderrStream = new();
+        await using StreamWriter stderr = new(stderrStream);
+
+        Application application = new(commandLineArguments, stdin, stdout, stderr);
         await application.Run();
 
         var expected = 0;
@@ -86,7 +102,10 @@ public class ApplicationTests
         using MemoryStream stdoutStream = new();
         await using StreamWriter stdout = new(stdoutStream);
 
-        Application application = new(commandLineArguments, stdin, stdout);
+        using MemoryStream stderrStream = new();
+        await using StreamWriter stderr = new(stderrStream);
+
+        Application application = new(commandLineArguments, stdin, stdout, stderr);
         await application.Run();
 
         var formattedXml = "<tag />";
@@ -111,13 +130,41 @@ public class ApplicationTests
         using MemoryStream stdoutStream = new();
         await using StreamWriter stdout = new(stdoutStream);
 
-        Application application = new(commandLineArguments, stdin, stdout);
+        using MemoryStream stderrStream = new();
+        await using StreamWriter stderr = new(stderrStream);
+
+        Application application = new(commandLineArguments, stdin, stdout, stderr);
         await application.Run();
 
         var expected = unformattedXml;
 
         var result = await this.ReadStringFromStream(stdoutStream);
         Assert.Equal(expected, result);
+    }
+
+    [Fact]
+    public async Task GivenInvalidXmlInStdinAnErrorIsWrittenToStderr()
+    {
+        var commandLineArguments = String.Empty;
+
+        using MemoryStream stdinStream = new();
+        using StreamReader stdin = new(stdinStream);
+
+        var unformattedXml = "<Invalid xml...";
+        await this.WriteStringToStream(unformattedXml, stdinStream);
+        stdinStream.Seek(0, SeekOrigin.Begin);
+
+        using MemoryStream stdoutStream = new();
+        await using StreamWriter stdout = new(stdoutStream);
+
+        using MemoryStream stderrStream = new();
+        await using StreamWriter stderr = new(stderrStream);
+
+        Application application = new(commandLineArguments, stdin, stdout, stderr);
+        await application.Run();
+
+        var result = await this.ReadStringFromStream(stderrStream);
+        Assert.False(String.IsNullOrWhiteSpace(result));
     }
 
     #endregion
