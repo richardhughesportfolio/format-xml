@@ -5,6 +5,8 @@ A command line utility to help format XML from `stdin` to `stdout`.
 - [format-xml](#format-xml)
   - [Usage](#usage)
     - [Examples](#examples)
+  - [Building](#building)
+    - [Version](#version)
 
 ## Usage
 
@@ -38,3 +40,21 @@ To see the help text:
 ```bash
 fxml --help
 ```
+
+## Building
+
+To build, simply run the `build.py` script. This will build, test and package the application. The resulting package will be saved in `./packages/fxml.tar.gz`.
+
+To build manually, you can do this from this repository's root directory:
+
+```bash
+dotnet build ./src/
+dotnet test ./src/ --no-build
+dotnet publish ./src/FormatXML/ --configuration="release" --output="./src/build/" --self-contained true
+```
+
+This will create a binary in the `./src/build/` directory called `FormatXML`.
+
+### Version
+
+You can set the version in the [`/src/version.txt`](/src/version.txt) file. The version is expected to be on the first line of this file. Each time you submit a PR, please update this version manually.
