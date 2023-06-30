@@ -20,10 +20,19 @@ def run_cmd(cmd, stdin=""):
         sys.exit(1)
 
 
+def get_version():
+    # the version is expected to be on the first line of this file
+    version_file_path = os.path.join(os.getcwd(), "src", "version.txt")
+    with open(version_file_path) as fp:
+        return fp.readline()
+
+
 def build():
     print("Building...")
 
     build_dir = os.path.join(os.getcwd(), "src", "build")
+
+    version = get_version()
 
     # see https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-publish
     build_cmd = [dotnet_path,
@@ -31,7 +40,8 @@ def build():
            "./src/FormatXML/",
            "--configuration=release",
            f"--output={build_dir}",
-           "--self-contained", "true"]
+           "--self-contained", "true",
+           f"/p:Version={version}"]
     run_cmd(build_cmd)
 
     original_binary_path = os.path.join(build_dir, "FormatXML")
