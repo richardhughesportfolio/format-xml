@@ -1,3 +1,5 @@
+using System.Reflection;
+
 namespace FormatXML;
 
 /// <summary>
@@ -137,7 +139,8 @@ public class Application
     /// </summary>
     private async Task OutputVersion()
     {
-        await this.WriteToStream("version text", this.Stdout);
+        var version = Assembly.GetExecutingAssembly().GetName().Version ?? new(1, 0);
+        await this.WriteToStream(version.ToString(), this.Stdout);
     }
     
     #endregion
