@@ -27,13 +27,13 @@ cat file.xml | fxml > formatted.xml
 echo "<tag/>" | fxml
 ```
 
-To fail on an error:
+To return a non-zero value on error:
 
 ```bash
 cat invalid.xml | fxml --strict > formatted.xml
 ```
 
-Note that `formatted.xml` will contain the contents of `invalid.xml`, because on error, the contents of `stdin` are outputted to `stdout`.
+Note that `formatted.xml` will still contain the contents of `invalid.xml`, because on error, the contents of `stdin` are outputted to `stdout`.
 
 To see the help text:
 

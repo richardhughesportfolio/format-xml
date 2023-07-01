@@ -22,7 +22,12 @@ public class Application
     /// Writes to `stderr`
     /// </summary>
     private TextWriter Stderr { get; }
-    
+
+    /// <summary>
+    /// Processes the command line arguments
+    /// </summary>
+    private CommandLineArgumentsParser CommandLineArguments { get; }
+
     #endregion
     
     #region Public Methods
@@ -33,7 +38,7 @@ public class Application
     /// <param name="commandLineArguments">The command line arguments that control how this application should behave</param>
     /// <param name="stdin">The stream to use for `stdin`</param>
     /// <param name="stdout">The stream to use for `stdout`</param>
-    /// <param name="stdout">The stream to use for `stderr`</param>
+    /// <param name="stderr">The stream to use for `stderr`</param>
     public Application(
         string commandLineArguments,
         TextReader stdin,
@@ -63,13 +68,29 @@ public class Application
         this.Stdin = stdin;
         this.Stdout = stdout;
         this.Stderr = stderr;
+
+        this.CommandLineArguments = new(commandLineArguments);
     }
 
     /// <summary>
     /// Runs this application based on the command line arguments passed into the constructor.
     /// </summary>
-    public async Task Run()
+    public async Task<int> Run()
     {
+        if (this.CommandLineArguments.Help)
+        {
+            await this.OutputHelp();
+
+            return 0;
+        }
+
+        if (this.CommandLineArguments.Version)
+        {
+            await this.OutputVersion();
+
+            return 0;
+        }
+
         var inputXml = await this.Stdin.ReadToEndAsync();
 
         var result = await Formatter.Format(inputXml);
@@ -79,10 +100,13 @@ public class Application
             await this.WriteToStream(errorMessage, this.Stderr);
 
             await this.WriteToStream(inputXml, this.Stdout);
-            return;
+
+            return this.CommandLineArguments.Strict ? 1 : 0;
         }
 
         await this.WriteToStream(result, this.Stdout);
+
+        return 0;
     }
     
     #endregion
@@ -100,5 +124,21 @@ public class Application
         await writer.FlushAsync();
     }
 
+    /// <summary>
+    /// Writes help text to stdout
+    /// </summary>
+    private async Task OutputHelp()
+    {
+        await this.WriteToStream("help text", this.Stdout);
+    }
+
+    /// <summary>
+    /// Writes this application's version to stdout
+    /// </summary>
+    private async Task OutputVersion()
+    {
+        await this.WriteToStream("version text", this.Stdout);
+    }
+    
     #endregion
 }

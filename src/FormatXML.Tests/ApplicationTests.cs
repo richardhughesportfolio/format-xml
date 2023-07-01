@@ -6,15 +6,6 @@ namespace FormatXML.Tests;
 
 public class ApplicationTests
 {
-    #region Properties
-
-    /// <summary>
-    /// Writes to stdout
-    /// </summary>
-    private ITestOutputHelper OutputHelper { get; set; }
-
-    #endregion
-
     #region Test Methods
 
     #region Constructor
@@ -75,7 +66,7 @@ public class ApplicationTests
         using StreamReader stdin = new(stdinStream);
 
         using MemoryStream stdoutStream = new();
-        using StreamWriter stdout = new(stdinStream);
+        await using StreamWriter stdout = new(stdinStream);
 
         using MemoryStream stderrStream = new();
         await using StreamWriter stderr = new(stderrStream);
@@ -85,6 +76,27 @@ public class ApplicationTests
 
         var expected = 0;
         Assert.Equal(expected, stdout.BaseStream.Length);
+    }
+
+    [Fact]
+    public async Task GivenEmptyStdinButNotStrictApplicationReturnsZero()
+    {
+        var commandLineArguments = String.Empty;
+
+        using MemoryStream stdinStream = new();
+        using StreamReader stdin = new(stdinStream);
+
+        using MemoryStream stdoutStream = new();
+        await using StreamWriter stdout = new(stdinStream);
+
+        using MemoryStream stderrStream = new();
+        await using StreamWriter stderr = new(stderrStream);
+
+        Application application = new(commandLineArguments, stdin, stdout, stderr);
+        var result = await application.Run();
+
+        var expected = 0;
+        Assert.Equal(expected, result);
     }
 
     [Fact]
@@ -112,6 +124,31 @@ public class ApplicationTests
         var expected = formattedXml;
 
         var result = await this.ReadStringFromStream(stdoutStream);
+        Assert.Equal(expected, result);
+    }
+
+    [Fact]
+    public async Task GivenValidXmlButNotStrictApplicationReturnsZero()
+    {
+        var commandLineArguments = String.Empty;
+
+        using MemoryStream stdinStream = new();
+        using StreamReader stdin = new(stdinStream);
+
+        var unformattedXml = "<tag/>";
+        await this.WriteStringToStream(unformattedXml, stdinStream);
+        stdinStream.Seek(0, SeekOrigin.Begin);
+
+        using MemoryStream stdoutStream = new();
+        await using StreamWriter stdout = new(stdoutStream);
+
+        using MemoryStream stderrStream = new();
+        await using StreamWriter stderr = new(stderrStream);
+
+        Application application = new(commandLineArguments, stdin, stdout, stderr);
+        var result = await application.Run();
+
+        var expected = 0;
         Assert.Equal(expected, result);
     }
 
@@ -167,16 +204,103 @@ public class ApplicationTests
         Assert.False(String.IsNullOrWhiteSpace(result));
     }
 
+    [Fact]
+    public async Task GivenInvalidXmlButNotStrictApplicationReturnsZero()
+    {
+        var commandLineArguments = String.Empty;
+
+        using MemoryStream stdinStream = new();
+        using StreamReader stdin = new(stdinStream);
+
+        var unformattedXml = "<Invalid xml...";
+        await this.WriteStringToStream(unformattedXml, stdinStream);
+        stdinStream.Seek(0, SeekOrigin.Begin);
+
+        using MemoryStream stdoutStream = new();
+        await using StreamWriter stdout = new(stdoutStream);
+
+        using MemoryStream stderrStream = new();
+        await using StreamWriter stderr = new(stderrStream);
+
+        Application application = new(commandLineArguments, stdin, stdout, stderr);
+        var result = await application.Run();
+
+        var expected = 0;
+        Assert.Equal(expected, result);
+    }
+
+    [Fact]
+    public async Task GivenInvalidXmlButIsStrictApplicationReturnsNonZero()
+    {
+        var commandLineArguments = "--strict";
+
+        using MemoryStream stdinStream = new();
+        using StreamReader stdin = new(stdinStream);
+
+        var unformattedXml = "<Invalid xml...";
+        await this.WriteStringToStream(unformattedXml, stdinStream);
+        stdinStream.Seek(0, SeekOrigin.Begin);
+
+        using MemoryStream stdoutStream = new();
+        await using StreamWriter stdout = new(stdoutStream);
+
+        using MemoryStream stderrStream = new();
+        await using StreamWriter stderr = new(stderrStream);
+
+        Application application = new(commandLineArguments, stdin, stdout, stderr);
+        var result = await application.Run();
+
+        var expected = 0;
+        Assert.NotEqual(expected, result);
+    }
+
+    [Fact]
+    public async Task GivenHelpCommandLineArgumentHelpIsWrittenToStdout()
+    {
+        var commandLineArguments = "--help";
+
+        using MemoryStream stdinStream = new();
+        using StreamReader stdin = new(stdinStream);
+
+        using MemoryStream stdoutStream = new();
+        await using StreamWriter stdout = new(stdoutStream);
+
+        using MemoryStream stderrStream = new();
+        await using StreamWriter stderr = new(stderrStream);
+
+        Application application = new(commandLineArguments, stdin, stdout, stderr);
+        await application.Run();
+
+        var result = await this.ReadStringFromStream(stdoutStream);
+        Assert.False(String.IsNullOrWhiteSpace(result));
+    }
+
+    [Fact]
+    public async Task GivenVersionCommandLineArgumentVersionIsWrittenToStdout()
+    {
+        var commandLineArguments = "--version";
+
+        using MemoryStream stdinStream = new();
+        using StreamReader stdin = new(stdinStream);
+
+        using MemoryStream stdoutStream = new();
+        await using StreamWriter stdout = new(stdoutStream);
+
+        using MemoryStream stderrStream = new();
+        await using StreamWriter stderr = new(stderrStream);
+
+        Application application = new(commandLineArguments, stdin, stdout, stderr);
+        await application.Run();
+
+        var result = await this.ReadStringFromStream(stdoutStream);
+        Assert.False(String.IsNullOrWhiteSpace(result));
+    }
+
     #endregion
     
     #endregion
     
     #region Helper Methods
-
-    public ApplicationTests(ITestOutputHelper outputHelper)
-    {
-        this.OutputHelper = outputHelper;
-    }
 
     /// <summary>
     /// Writes the passed string to the passed stream
