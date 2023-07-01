@@ -157,14 +157,14 @@ Usage:
     cat input.xml | fxml [runtime-options] > output.xml
 
 runtime-options:
-    --strict    On error, return a non-zero value
+    --strict/-s    On error, return a non-zero value
 
 Usage:
     fxml [additional-commands]
 
 additional-commands:
-    --version   Displays this application's version
-    --help      Displays this application's help text
+    --version/-v   Displays this application's version
+    --help/-h      Displays this application's help text
 
 See: https://github.com/richardjhughes/format-xml
 
