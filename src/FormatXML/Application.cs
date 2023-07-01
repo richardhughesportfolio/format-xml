@@ -127,20 +127,50 @@ public class Application
     }
 
     /// <summary>
-    /// Writes help text to stdout
-    /// </summary>
-    private async Task OutputHelp()
-    {
-        await this.WriteToStream("help text", this.Stdout);
-    }
-
-    /// <summary>
     /// Writes this application's version to stdout
     /// </summary>
     private async Task OutputVersion()
     {
         var version = Assembly.GetExecutingAssembly().GetName().Version ?? new(1, 0);
         await this.WriteToStream(version.ToString(), this.Stdout);
+    }
+
+    /// <summary>
+    /// Writes help text to stdout
+    /// </summary>
+    private async Task OutputHelp()
+    {
+        const string helpText =
+"""
+FormatXML takes XML via `stdin` and outputs the formatted XML via `stdout`. Errors are written to `stderr`.
+
+Empty input results in empty output.
+
+If the XML is invalid or cannot be formatted, an error will be written to `stderr` and the input will be written to `stdout`.
+
+If an error occurs, `fxml` will still return `0`. If you would like a non-zero value returned, you can pass the `--strict` flag.
+
+=====
+
+Usage:
+    echo "<xml/>" | fxml [runtime-options] > output.xml
+    cat input.xml | fxml [runtime-options] > output.xml
+
+runtime-options:
+    --strict    On error, return a non-zero value
+
+Usage:
+    fxml [additional-commands]
+
+additional-commands:
+    --version   Displays this application's version
+    --help      Displays this application's help text
+
+See: https://github.com/richardjhughes/format-xml
+
+""";
+
+        await this.WriteToStream(helpText, this.Stdout);
     }
     
     #endregion
