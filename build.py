@@ -76,7 +76,7 @@ def build(arch):
 def test(binary_path, arch):
     print("Testing...")
 
-    if platform.machine() == "AMD64" and arch == "arm64":
+    if platform.machine() == "amd64" and arch == "arm64":
         print("Cannot run arm64 tests on amd64 machine. Skipping tests...")
         return
 
