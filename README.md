@@ -3,10 +3,16 @@
 A command line utility to help format XML from `stdin` to `stdout`.
 
 - [format-xml](#format-xml)
+  - [Build Statuses](#build-statuses)
   - [Usage](#usage)
     - [Examples](#examples)
   - [Building](#building)
     - [Version](#version)
+  - [License](#license)
+
+## Build Statuses
+
+![Build Mac](https://github.com/richardjhughes/format-xml/actions/workflows/build_mac.yml/badge.svg)
 
 ## Usage
 
@@ -57,4 +63,9 @@ This will create a binary in the `./src/build/` directory called `FormatXML`.
 
 ### Version
 
-You can set the version in the [`/src/version.txt`](/src/version.txt) file. The version is expected to be on the first line of this file. Each time you submit a PR, please update this version manually.
+You can set the version in the [`/src/version.txt`](/src/version.txt) file. The version is expected to be on the first line of this file. Each time you submit a PR, please update this version manually.                                                                                          |
+
+## License
+
+![License](https://img.shields.io/github/license/richardjhughes/format-xml?style=plastic)
+
