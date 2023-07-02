@@ -54,6 +54,13 @@ def build():
 def test(binary_path):
     print("Testing...")
 
+    test_correct_formatting(binary_path)
+    test_correct_exit_code_on_failure_with_strict_mode(binary_path)
+
+
+def test_correct_formatting(binary_path):
+    print("Test correct formatting...")
+
     test_cmd = [binary_path]
 
     test_input = "<tag/>"
@@ -64,11 +71,27 @@ def test(binary_path):
         sys.exit(1)
 
 
+def test_correct_exit_code_on_failure_with_strict_mode(binary_path):
+    print("Test correct exit code on failure with strict mode...")
+
+    # we want this command to fail, so we can't use `run_cmd()`
+    try:
+        test_cmd = [binary_path, "--strict"]
+        test_input = "<invalid xml..."
+
+        subprocess.run(test_cmd, check=True, input=test_input.encode(), capture_output=True)
+    except Exception:
+        return
+
+    print(f"Binary `{binary_path}` did not produce correct error code on failure with strict mode.")
+    sys.exit(1)
+
+
 def package(binary_path):
     print("Packaging...")
 
     packages_path = os.path.join(os.getcwd(), "packages")
-    os.makedirs(packages_path)
+    os.makedirs(packages_path, exist_ok=True)
 
     package_path = os.path.join(packages_path, "fxml.tar.gz")
     with tarfile.open(package_path, "w:gz") as tar:

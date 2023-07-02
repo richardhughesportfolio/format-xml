@@ -5,4 +5,5 @@ Application application = new(
     Console.In,
     Console.Out,
     Console.Error);
-await application.Run();
+
+Environment.ExitCode = await application.Run();
