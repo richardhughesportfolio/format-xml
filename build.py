@@ -5,9 +5,18 @@ import os
 import sys
 import shutil
 import tarfile
+import argparse
+import platform
 import subprocess
 
 dotnet_path = shutil.which("dotnet")
+
+def configure_arguments():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-a", "--arch", action="store", choices=["amd64", "arm64"], required=False, default="amd64", help="the target architecture")
+
+    return parser.parse_args()
+
 
 def run_cmd(cmd, stdin=""):
     print(f"Running command: '{cmd}'")
@@ -27,12 +36,24 @@ def get_version():
         return fp.readline()
 
 
-def build():
+def get_target_architecture(arch):
+    if arch == "amd64":
+        return "x64"
+    elif arch == "arm64":
+        return "arm64"
+    else:
+        print(f"Unsupported architecture: {arch}")
+        sys.exit(1)
+
+
+def build(arch):
     print("Building...")
 
     build_dir = os.path.join(os.getcwd(), "src", "build")
 
     version = get_version()
+
+    target_architecture = get_target_architecture(arch)
 
     # see https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-publish
     build_cmd = [dotnet_path,
@@ -41,6 +62,7 @@ def build():
            "--configuration=release",
            f"--output={build_dir}",
            "--self-contained", "true",
+           f"--arch={target_architecture}",
            f"/p:Version={version}"]
     run_cmd(build_cmd)
 
@@ -87,25 +109,47 @@ def test_correct_exit_code_on_failure_with_strict_mode(binary_path):
     sys.exit(1)
 
 
-def package(binary_path):
+def package(binary_path, arch):
     print("Packaging...")
 
     packages_path = os.path.join(os.getcwd(), "packages")
     os.makedirs(packages_path, exist_ok=True)
 
-    package_path = os.path.join(packages_path, "fxml.tar.gz")
+    package_name = get_package_name(arch)
+
+    package_path = os.path.join(packages_path, package_name)
     with tarfile.open(package_path, "w:gz") as tar:
         tar.add(binary_path, arcname="fxml")
 
     print(f"Package created at: `{package_path}`.")
 
 
+def get_package_name(arch):
+    platform_name = platform.system()
+
+    os_name = ""
+
+    if platform_name == "Darwin":
+        os_name = "darwin"
+    elif platform_name == "Windows":
+        os_name = "windows"
+    elif platform_name == "Linux":
+        os_name = "linux"
+    else:
+        print(f"Unsupported platform: {platform_name}")
+        sys.exit(1)
+
+    return f"fxml_{os_name}_{arch}.tar.gz"
+
+
 print("Building format-xml...")
 
-binary_path = build()
+args = configure_arguments()
+
+binary_path = build(args.arch)
 
 test(binary_path)
 
-package(binary_path)
+package(binary_path, args.arch)
 
 print("Built format-xml.")

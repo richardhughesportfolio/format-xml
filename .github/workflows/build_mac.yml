@@ -31,12 +31,22 @@ jobs:
     - name: Test
       run: dotnet test ./src/ --no-build --verbosity normal
 
-    - name: Package
-      run: python3 build.py
+    - name: Package arm64
+      run: python3 build.py --arch=arm64
 
-    - name: Save Package Artifact
+    - name: Package amd64
+      run: python3 build.py --arch=amd64
+
+    - name: Save Package Artifact arm64
       uses: actions/upload-artifact@v3.1.2
       with:
-        name: fxml.tar.gz
-        path: ./packages/fxml.tar.gz
+        name: fxml_darwin_arm64.tar.gz
+        path: ./packages/fxml_darwin_arm64.tar.gz
+        retention-days: 0
+
+    - name: Save Package Artifact amd64
+      uses: actions/upload-artifact@v3.1.2
+      with:
+        name: fxml_darwin_amd64.tar.gz
+        path: ./packages/fxml_darwin_amd64.tar.gz
         retention-days: 0
