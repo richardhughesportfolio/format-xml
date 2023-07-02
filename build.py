@@ -66,8 +66,12 @@ def build(arch):
            f"/p:Version={version}"]
     run_cmd(build_cmd)
 
-    original_binary_path = os.path.join(build_dir, "FormatXML")
-    new_binary_ptah = os.path.join(build_dir, "fxml")
+    original_binary_name = get_application_binary_name_from_build()
+    original_binary_path = os.path.join(build_dir, original_binary_name)
+
+    new_binary_name = get_application_binary_name()
+    new_binary_ptah = os.path.join(build_dir, new_binary_name)
+
     shutil.move(original_binary_path, new_binary_ptah)
 
     return new_binary_ptah
@@ -76,7 +80,7 @@ def build(arch):
 def test(binary_path, arch):
     print("Testing...")
 
-    if platform.machine() != "arm64" and arch == "arm64":
+    if platform.machine().lower() != "arm64" and arch == "arm64":
         print("Cannot run arm64 tests on amd64 machine. Skipping tests...")
         return
 
@@ -120,10 +124,11 @@ def package(binary_path, arch):
     os.makedirs(packages_path, exist_ok=True)
 
     package_name = get_package_name(arch)
+    binary_name = get_application_binary_name()
 
     package_path = os.path.join(packages_path, package_name)
     with tarfile.open(package_path, "w:gz") as tar:
-        tar.add(binary_path, arcname="fxml")
+        tar.add(binary_path, arcname=binary_name)
 
     print(f"Package created at: `{package_path}`.")
 
@@ -144,6 +149,18 @@ def get_package_name(arch):
         sys.exit(1)
 
     return f"fxml_{os_name}_{arch}.tar.gz"
+
+
+def get_application_binary_name_from_build():
+    platform_name = platform.system()
+
+    return "FormatXML.exe" if platform_name == "Windows" else "FormatXML"
+
+
+def get_application_binary_name():
+    platform_name = platform.system()
+
+    return "fxml.exe" if platform_name == "Windows" else "fxml"
 
 
 print("Building format-xml...")
