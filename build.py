@@ -73,8 +73,12 @@ def build(arch):
     return new_binary_ptah
 
 
-def test(binary_path):
+def test(binary_path, arch):
     print("Testing...")
+
+    if platform.machine() == "AMD64" and arch == "arm64":
+        print("Cannot run arm64 tests on amd64 machine. Skipping tests...")
+        return
 
     test_correct_formatting(binary_path)
     test_correct_exit_code_on_failure_with_strict_mode(binary_path)
@@ -148,7 +152,7 @@ args = configure_arguments()
 
 binary_path = build(args.arch)
 
-test(binary_path)
+test(binary_path, args.arch)
 
 package(binary_path, args.arch)
 
