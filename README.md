@@ -12,7 +12,9 @@ A command line utility to help format XML from `stdin` to `stdout`.
 
 ## Build Statuses
 
+![Build Mac](https://github.com/richardjhughes/format-xml/actions/workflows/build_windows.yml/badge.svg)
 ![Build Mac](https://github.com/richardjhughes/format-xml/actions/workflows/build_mac.yml/badge.svg)
+![Build Mac](https://github.com/richardjhughes/format-xml/actions/workflows/build_linux.yml/badge.svg)
 
 ## Usage
 
@@ -48,6 +50,8 @@ fxml --help
 ```
 
 ## Building
+
+Make sure you have the [.NET 8 SDK](https://dotnet.microsoft.com/en-us/download) installed.
 
 To build, simply run the `build.py` script. This will build, test and package the application. The resulting package will be saved in `./packages/fxml.tar.gz`.
 
